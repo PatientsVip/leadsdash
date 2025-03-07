@@ -256,7 +256,7 @@ export async function getOverviewMetrics(hospitalName = null) {
       qualified: data.filter(lead => lead.qualified === 'qualified').length,
       disqualified: data.filter(lead => lead.qualified === 'DNQ').length,
       photoSubmitted: data.filter(lead => lead.photo_submitted_at).length,
-      basicSignup: data.filter(lead => !lead.qualified && !lead.photo_submitted_at).length,
+      basicSignup: data.filter(lead => !lead.qualified).length,
       hospitals: [...new Set(data.map(lead => lead.hospital_name))]
     }
 
