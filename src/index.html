@@ -226,11 +226,31 @@
                 </div>
                 <div class="flex flex-col gap-2">
                   <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-500 dark:text-gray-400">Seemingly Eligible</span>
+                    <div class="flex items-center gap-2">
+                      <span class="text-sm text-gray-500 dark:text-gray-400">Seemingly Eligible</span>
+                      <div class="group relative">
+                        <svg class="w-4 h-4 text-gray-400 dark:text-gray-500 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+                        </svg>
+                        <div class="invisible group-hover:visible absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-gray-900 text-white text-sm rounded-lg">
+                          Sign ups who seem eligible based on their online prescreening answers.
+                        </div>
+                      </div>
+                    </div>
                     <span id="qualified-leads" class="text-2xl font-bold text-success dark:text-[#10b981]">0</span>
                   </div>
                   <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-500 dark:text-gray-400">Ineligible</span>
+                    <div class="flex items-center gap-2">
+                      <span class="text-sm text-gray-500 dark:text-gray-400">SeeminglyIneligible</span>
+                      <div class="group relative">
+                        <svg class="w-4 h-4 text-gray-400 dark:text-gray-500 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+                        </svg>
+                        <div class="invisible group-hover:visible absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-gray-900 text-white text-sm rounded-lg">
+                          Sign ups who seem ineligible based on their online prescreening answers.
+                        </div>
+                      </div>
+                    </div>
                     <span id="dnq-leads" class="text-2xl font-bold text-danger dark:text-[#ef4444]">0</span>
                   </div>
                   <div class="flex justify-between items-center">
@@ -252,17 +272,17 @@
                   </div>
                   <div class="flex justify-between items-center">
                     <div class="flex items-center gap-2">
-                      <span class="text-sm text-gray-500 dark:text-gray-400">Submission Rate</span>
+                   <!-- <span class="text-sm text-gray-500 dark:text-gray-400">Submission Rate</span> -->
                       <div class="group relative">
-                        <svg class="w-4 h-4 text-gray-400 dark:text-gray-500 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+                        <!-- <svg class="w-4 h-4 text-gray-400 dark:text-gray-500 cursor-help" fill="currentColor" viewBox="0 0 20 20">
                           <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
-                        </svg>
+                        </svg> --->
                         <div class="invisible group-hover:visible absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-gray-900 text-white text-sm rounded-lg">
                           Percentage of seemingly eligible leads who have submitted photos
-                        </div>
+                        </div> 
                       </div>
                     </div>
-                    <span id="photo-rate" class="text-2xl font-bold text-black dark:text-white">0%</span>
+                  <!-- <span id="photo-rate" class="text-2xl font-bold text-black dark:text-white">0%</span> --->
                   </div>
                 </div>
               </div>
