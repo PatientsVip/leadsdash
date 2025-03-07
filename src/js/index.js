@@ -137,41 +137,36 @@ let selectedHospital = ''
 let selectedTimeRange = 7
 
 // Initialize the dashboard
-async function initializeDashboard() {
+document.addEventListener('DOMContentLoaded', async function() {
   console.log('Initializing dashboard...');
-  
   try {
-    // Load hospitals into filter
-    const hospitals = await getHospitalsList()
+    // Get hospitals list for dropdown
+    const hospitals = await getHospitalsList();
     console.log('Fetched hospitals:', hospitals);
-    
-    const hospitalFilter = document.getElementById('hospital-filter')
-    if (!hospitalFilter) {
-      console.error('Hospital filter element not found!');
-      return;
-    }
-    
-    // Clear existing options except the first one
-    while (hospitalFilter.options.length > 1) {
-      hospitalFilter.remove(1);
-    }
-    
-    // Add new options
-    hospitals.forEach(hospital => {
-      if (hospital) {  // Only add if hospital name exists
-        const option = document.createElement('option')
-        option.value = hospital
-        option.textContent = hospital
-        hospitalFilter.appendChild(option)
-      }
-    })
 
-    // Set up event listeners
-    hospitalFilter.addEventListener('change', (e) => {
-      console.log('Hospital changed to:', e.target.value);
-      selectedHospital = e.target.value
-      updateDashboard()
-    })
+    // Populate hospital dropdown
+    const hospitalSelect = document.getElementById('hospital-filter');
+    if (hospitalSelect) {
+      // Clear existing options except the first one
+      while (hospitalSelect.options.length > 1) {
+        hospitalSelect.remove(1);
+      }
+
+      hospitals.forEach(hospital => {
+        if (hospital) {  // Only add if hospital name exists
+          const option = document.createElement('option');
+          option.value = hospital;
+          option.textContent = hospital;
+          hospitalSelect.appendChild(option);
+        }
+      });
+
+      // Listen for changes
+      hospitalSelect.addEventListener('change', (e) => {
+        selectedHospital = e.target.value;
+        updateDashboard();
+      });
+    }
 
     // Time range buttons
     document.querySelectorAll('.time-btn').forEach(btn => {
@@ -195,67 +190,69 @@ async function initializeDashboard() {
     });
 
     // Date picker
-    const datePicker = document.querySelector('.datepicker')
+    const datePicker = document.querySelector('.datepicker');
     if (datePicker) {
       datePicker.addEventListener('change', (e) => {
         console.log('Date range changed:', e.target.value);
-        const [start, end] = e.target.value.split(' - ')
-        updateChart(new Date(start), new Date(end))
-      })
+        const [start, end] = e.target.value.split(' - ');
+        updateChart(new Date(start), new Date(end));
+      });
     }
 
     // Initial load
     console.log('Loading initial dashboard data...');
-    await updateDashboard()
+    await updateDashboard();
 
     // Set up real-time updates
     subscribeToLeadUpdates((payload) => {
       console.log('Received real-time update:', payload);
-      updateDashboard()
-    })
+      updateDashboard();
+    });
   } catch (error) {
     console.error('Error initializing dashboard:', error);
   }
-}
+});
 
 // Update all dashboard components
 async function updateDashboard() {
-  const metrics = await getOverviewMetrics(selectedHospital)
-  if (!metrics) return
+  const metrics = await getOverviewMetrics(selectedHospital);
+  if (!metrics) return;
 
   // Update metrics
-  updateMetricsDisplay(metrics)
+  try {
+    updateMetricsDisplay(metrics);
 
-  // Update chart
-  const endDate = new Date()
-  const startDate = new Date()
-  startDate.setDate(endDate.getDate() - selectedTimeRange)
-  updateChart(startDate, endDate)
+    // Update chart
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(endDate.getDate() - selectedTimeRange);
+    updateChart(startDate, endDate);
+  } catch (error) {
+    console.error('Error updating dashboard:', error);
+  }
 }
 
 // Update metrics display
 function updateMetricsDisplay(metrics) {
-  // Overall leads
-  document.getElementById('total-signups').textContent = metrics.totalSignups
-  document.getElementById('basic-signups').textContent = metrics.basicSignup
-  document.getElementById('recent-signups').textContent = metrics.last7Days
+  const elements = {
+    'total-signups': metrics.totalSignups,
+    'basic-signups': metrics.basicSignup,
+    'recent-signups': metrics.last7Days,
+    'qualified-leads': metrics.qualified,
+    'dnq-leads': metrics.disqualified,
+    'pending-leads': metrics.totalSignups - (metrics.qualified + metrics.disqualified),
+    'photo-submitted': metrics.photoSubmitted,
+    'daily-average': metrics.averagePerDay,
+    'week-average': metrics.weekAverage
+  };
 
-  // Status
-  document.getElementById('qualified-leads').textContent = metrics.qualified
-  document.getElementById('dnq-leads').textContent = metrics.disqualified
-  document.getElementById('pending-leads').textContent = 
-    metrics.totalSignups - (metrics.qualified + metrics.disqualified)
-
-  // Photo submissions
-  document.getElementById('photo-submitted').textContent = metrics.photoSubmitted
-  const photoRate = metrics.qualified > 0 
-    ? ((metrics.photoSubmitted / metrics.qualified) * 100).toFixed(1)
-    : '0.0'
-  document.getElementById('photo-rate').textContent = `${photoRate}%`
-
-  // Averages
-  document.getElementById('daily-average').textContent = metrics.averagePerDay
-  document.getElementById('week-average').textContent = metrics.weekAverage
+  // Update each element if it exists
+  Object.entries(elements).forEach(([id, value]) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.textContent = value;
+    }
+  });
 }
 
 // Update the chart
@@ -453,9 +450,6 @@ async function updateChart(startDate, endDate) {
     console.error('Error updating chart:', error);
   }
 }
-
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', initializeDashboard)
 
 // Hospital Search Functionality
 let searchTimeout;
