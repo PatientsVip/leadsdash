@@ -8,5 +8,15 @@
         "distDir": "public"
       }
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/sid73",
+      "destination": "/sid73.html"
+    },
+    {
+      "source": "/sid82",
+      "destination": "/sid82.html"
+    }
   ]
 } 

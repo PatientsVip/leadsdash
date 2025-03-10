@@ -24,22 +24,31 @@ const paths = [];
 const generateHTMLPlugins = () =>
   glob.sync("./src/*.html").map((dir) => {
     const filename = path.basename(dir);
+    const name = filename.replace('.html', '');
 
     if (filename !== "404.html") {
       paths.push(filename);
     }
+
+    // Map HTML files to their corresponding JS files
+    const jsEntry = name.includes('73') ? 'index_73' : name.includes('82') ? 'index_82' : 'index';
 
     return new HtmlWebpackPlugin({
       filename,
       template: `./src/${filename}`,
       favicon: `./src/images/color.ico`,
       inject: "body",
+      chunks: [jsEntry] // This ensures each HTML file only gets its corresponding JS
     });
   });
 
 module.exports = {
   mode: "development",
-  entry: "./src/js/index.js",
+  entry: {
+    index: "./src/js/index.js",
+    index_73: "./src/js/index_73.js",
+    index_82: "./src/js/index_82.js"
+  },
   devServer: {
     static: {
       directory: path.join(__dirname, "./public"),
@@ -104,11 +113,11 @@ module.exports = {
     }),
   ],
   output: {
-    filename: "bundle.js",
+    filename: "js/[name].bundle.js",
     path: path.resolve(__dirname, "public"),
     clean: true,
     assetModuleFilename: "[path][name][ext]",
   },
-  target: "web", // fix for "browserslist" error message
-  stats: "errors-only", // suppress irrelevant log messages
+  target: "web",
+  stats: "errors-only",
 };
