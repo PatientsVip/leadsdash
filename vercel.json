@@ -17,10 +17,10 @@
     {
       "source": "/sid82",
       "destination": "/sid82.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/404.html"
     }
-  ],
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "status": 404, "dest": "/404.html" }
   ]
 } 
