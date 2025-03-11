@@ -166,7 +166,11 @@
           <li>
             <a
               href="#"
-              @click.prevent="localStorage.removeItem('auth'); isAuthenticated = false;"
+              @click.prevent="
+                const pageId = document.querySelector('meta[name=\'page-id\']').content;
+                localStorage.removeItem(`auth_${pageId}`);
+                isAuthenticated = false;
+              "
               class="menu-item group menu-item-inactive"
             >
               <svg
