@@ -255,8 +255,13 @@ export async function getOverviewMetrics(hospitalName = null) {
       weekAverage: calculateWeekAverage(data),
       qualified: data.filter(lead => lead.qualified === 'qualified').length,
       disqualified: data.filter(lead => lead.qualified === 'DNQ').length,
-      photoSubmitted: data.filter(lead => lead.photo_submitted_at).length,
-      basicSignup: data.filter(lead => !lead.qualified).length,
+      photoSubmitted: data.filter(lead => lead.photo_submitted_at === true).length,
+      contactSubmitted: data.filter(lead => lead.contact_submitted_at === true).length,
+      prescreenSubmitted: data.filter(lead => lead.prescreen_submitted_at === true).length,
+      basicSignup: data.filter(lead => 
+        lead.contact_submitted_at === true && 
+        lead.prescreen_submitted_at !== true
+      ).length,
       hospitals: [...new Set(data.map(lead => lead.hospital_name))]
     }
 

@@ -100,7 +100,7 @@ export function subscribeToChanges(tableName, callback) {
 export async function getTotalSignupsByHospital() {
   try {
     const { data, error } = await supabase
-      .from('leads')
+      .from('leads_82')
       .select('hospital_name, count(*)')
       .group('hospital_name')
     
@@ -116,7 +116,7 @@ export async function getTotalSignupsByHospital() {
 export async function getRecentSignupsByHospital() {
   try {
     const { data, error } = await supabase
-      .from('leads')
+      .from('leads_82')
       .select('hospital_name, count(*)')
       .gte('contact_submitted_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
       .group('hospital_name')
@@ -133,7 +133,7 @@ export async function getRecentSignupsByHospital() {
 export async function getQualificationMetrics() {
   try {
     const { data, error } = await supabase
-      .from('leads')
+      .from('leads_82')
       .select('hospital_name, qualified, count(*)')
       .not('qualified', 'is', null)
       .group('hospital_name, qualified')
@@ -150,10 +150,10 @@ export async function getQualificationMetrics() {
 export async function getPhotoSubmissionMetrics() {
   try {
     const { data, error } = await supabase
-      .from('leads')
+      .from('leads_82')
       .select('hospital_name, count(*)')
       .eq('qualified', 'qualified')
-      .not('photo_submitted_at', 'is', null)
+      .eq('photo_submitted_at', true)
       .group('hospital_name')
     
     if (error) throw error
@@ -182,11 +182,11 @@ export async function getDailyAverageSignups() {
 export async function getSignupsByDateRange(startDate, endDate) {
   try {
     const { data, error } = await supabase
-      .from('leads')
-      .select('hospital_name, contact_submitted_at')
-      .gte('contact_submitted_at', startDate)
-      .lte('contact_submitted_at', endDate)
-      .order('contact_submitted_at', { ascending: true })
+      .from('leads_82')
+      .select('hospital_name, created_at')
+      .gte('created_at', startDate)
+      .lte('created_at', endDate)
+      .order('created_at', { ascending: true })
     
     if (error) throw error
     return data
@@ -234,7 +234,7 @@ function calculateWeekAverage(data) {
 export async function getOverviewMetrics(hospitalName = null) {
   try {
     let query = supabase
-      .from('leads')
+      .from('leads_82')
       .select('*')
 
     if (hospitalName) {
@@ -255,8 +255,13 @@ export async function getOverviewMetrics(hospitalName = null) {
       weekAverage: calculateWeekAverage(data),
       qualified: data.filter(lead => lead.qualified === 'qualified').length,
       disqualified: data.filter(lead => lead.qualified === 'DNQ').length,
-      photoSubmitted: data.filter(lead => lead.photo_submitted_at).length,
-      basicSignup: data.filter(lead => !lead.qualified).length,
+      photoSubmitted: data.filter(lead => lead.photo_submitted_at === true).length,
+      contactSubmitted: data.filter(lead => lead.contact_submitted_at === true).length,
+      prescreenSubmitted: data.filter(lead => lead.prescreen_submitted_at === true).length,
+      basicSignup: data.filter(lead => 
+        lead.contact_submitted_at === true && 
+        lead.prescreen_submitted_at !== true
+      ).length,
       hospitals: [...new Set(data.map(lead => lead.hospital_name))]
     }
 
@@ -281,7 +286,7 @@ export async function getDailySignups(startDate, endDate, hospitalName = null) {
     });
 
     let query = supabase
-      .from('leads')
+      .from('leads_82')
       .select('created_at, hospital_name')
       .gte('created_at', formattedStartDate)
       .lte('created_at', formattedEndDate)
@@ -335,7 +340,7 @@ export async function getDailySignups(startDate, endDate, hospitalName = null) {
 export async function getHospitalsList() {
   try {
     const { data, error } = await supabase
-      .from('leads')
+      .from('leads_82')
       .select('hospital_name')
       .then(result => {
         // Get unique hospital names
@@ -359,7 +364,7 @@ export function subscribeToLeadUpdates(callback) {
   return supabase
     .channel('leads-channel')
     .on('postgres_changes', 
-      { event: '*', schema: 'public', table: 'leads' },
+      { event: '*', schema: 'public', table: 'leads_82' },
       callback
     )
     .subscribe()
@@ -368,24 +373,24 @@ export function subscribeToLeadUpdates(callback) {
 // Test function to check table access
 export async function testLeadsTableAccess() {
   try {
-    console.log('Testing leads table access...');
+    console.log('Testing leads_82 table access...');
     
     // Try to get table info
     const { data: tableData, error: tableError } = await supabase
-      .from('leads')
+      .from('leads_82')
       .select('*')
       .limit(1);
 
     if (tableError) {
-      console.error('Error accessing leads table:', tableError);
+      console.error('Error accessing leads_82 table:', tableError);
       return false;
     }
 
-    console.log('Successfully accessed leads table. Sample data:', tableData);
+    console.log('Successfully accessed leads_82 table. Sample data:', tableData);
     
     // Get table structure
     const { data: structureData, error: structureError } = await supabase
-      .rpc('get_table_structure', { table_name: 'leads' })
+      .rpc('get_table_structure', { table_name: 'leads_82' })
       .select('*');
 
     if (structureError) {
@@ -404,7 +409,7 @@ export async function testLeadsTableAccess() {
 // Call this at initialization
 document.addEventListener('DOMContentLoaded', async () => {
   const hasAccess = await testLeadsTableAccess();
-  console.log('Has access to leads table:', hasAccess);
+  console.log('Has access to leads_82 table:', hasAccess);
 });
 
 // Let's also add a test function to verify the data
@@ -414,7 +419,7 @@ export async function testDataQuery() {
     
     // Get the most recent entry
     const { data: recentData, error: recentError } = await supabase
-      .from('leads')
+      .from('leads_82')
       .select('created_at, hospital_name')
       .order('created_at', { ascending: false })
       .limit(1);
@@ -432,7 +437,7 @@ export async function testDataQuery() {
     const formattedDate = sevenDaysAgo.toISOString().replace('T', ' ').split('.')[0];
 
     const { data: weekData, error: weekError } = await supabase
-      .from('leads')
+      .from('leads_82')
       .select('created_at, hospital_name')
       .gte('created_at', formattedDate)
       .order('created_at', { ascending: true });
